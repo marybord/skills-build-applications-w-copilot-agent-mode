@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
+import os
+from django.http import JsonResponse
 
 router = DefaultRouter()
 router.register(r'users', views.UserViewSet, basename='user')
@@ -25,8 +27,15 @@ router.register(r'activities', views.ActivityViewSet, basename='activity')
 router.register(r'workouts', views.WorkoutViewSet, basename='workout')
 router.register(r'leaderboards', views.LeaderboardViewSet, basename='leaderboard')
 
+# Helper endpoint to show API base URL using $CODESPACE_NAME
+def api_base_url(request):
+    codespace_name = os.environ.get('CODESPACE_NAME', 'localhost')
+    api_url = f"https://{codespace_name}-8000.app.github.dev/api/"
+    return JsonResponse({"api_base_url": api_url})
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.api_root, name='api-root'),
     path('api/', include(router.urls)),
+    path('api-base-url/', api_base_url, name='api-base-url'),
 ]
